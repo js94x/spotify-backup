@@ -186,7 +186,7 @@ def main():
 			json.dump({
 				'playlists': playlists,
 				'albums': liked_albums
-			}, f)
+			}, f, indent=2)
 		
 		# Tab-separated file.
 		else:
