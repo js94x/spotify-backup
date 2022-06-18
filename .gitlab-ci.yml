@@ -8,6 +8,7 @@ stages:
 
 before_script:
   - python --version  # For debugging
+  - pip install markdown
   
 test:
   script:
@@ -17,10 +18,12 @@ run:
   script:
     - python spotify-backup.py --format=json --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.json
     - python spotify-backup.py --format=md --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.md
+    - python -m markdown output.md -x extra -f output.html
   artifacts:
     paths:
       - output.json
       - output.md
+      - output.html
   # trigger this job only "by-hand"
   when: manual
 
