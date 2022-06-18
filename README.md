@@ -13,6 +13,10 @@ or, to get a JSON dump, use:
 
     python spotify-backup.py playlists.json --format=json
 
+or, to get a Markdown file, use:
+
+    python spotify-backup.py playlists.md --format=md
+
 By default, it includes your playlists. To include your Liked Songs, you can use:
 
     python spotify-backup.py playlists.txt --dump=liked,playlists

@@ -16,9 +16,11 @@ test:
 run:
   script:
     - python spotify-backup.py --format=json --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.json
+    - python spotify-backup.py --format=md --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.md
   artifacts:
     paths:
       - output.json
+      - output.md
   # trigger this job only "by-hand"
   when: manual
 

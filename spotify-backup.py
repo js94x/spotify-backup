@@ -150,7 +150,7 @@ def main():
 	                                                         + '`playlist-read-private` permission)')
 	parser.add_argument('--dump', default='playlists', choices=['liked,playlists', 'playlists,liked', 'playlists', 'liked'],
 	                    help='dump playlists or liked songs, or both (default: playlists)')
-	parser.add_argument('--format', default='txt', choices=['json', 'txt'], help='output format (default: txt)')
+	parser.add_argument('--format', default='txt', choices=['json', 'txt', 'md'], help='output format (default: txt)')
 	parser.add_argument('file', help='output filename', nargs='?')
 	args = parser.parse_args()
 	
@@ -206,6 +206,22 @@ def main():
 				'albums': liked_albums
 			}, f, indent=2)
 		
+		# Markdown
+		elif args.format == 'md':
+			f.write('# Spotify Dump\n\n')
+			for playlist in playlists:
+				f.write('## ' + playlist['name'] + '\n\n')
+				f.write('|Titel|Artist(s)|Album|\n')
+				f.write('|---|---|---|\n')
+				for track in playlist['tracks']:
+					if track['track'] is None:
+						continue
+					f.write('|{name}|{artists}|{album}|\n'.format(
+						name=track['track']['name'],
+						artists=', '.join([artist['name'] for artist in track['track']['artists']]),
+						album=track['track']['album']['name']
+					))
+				f.write('\n')
 		# Tab-separated file.
 		else:
 			f.write('Playlists: \r\n\r\n')
