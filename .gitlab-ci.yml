@@ -2,8 +2,16 @@
 # https://hub.docker.com/r/library/python/tags/
 image: python:latest
 
+stages:
+  - test
+  - run
+
 before_script:
   - python --version  # For debugging
+  
+test:
+  script:
+    - python -m py_compile *.py
 
 run:
   script:
@@ -11,6 +19,8 @@ run:
   artifacts:
     paths:
       - output.json
+  # trigger this job only "by-hand"
+  when: manual
 
 #pages:
 #  script:
