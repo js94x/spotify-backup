@@ -29,7 +29,7 @@ run:
   script:
     # - pip install dist/*
     # run the command here
-    - python spotify-backup.py --format=json --dump=liked,playlists --token=$SPOTIFY_OAUTH_TOKEN
+    - python spotify-backup.py --format=json --dump=liked,playlists --token=$SPOTIFY_OAUTH_TOKEN output.json
 #  artifacts:
 #    paths:
 #      - dist/*.whl
