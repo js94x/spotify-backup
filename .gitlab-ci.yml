@@ -17,18 +17,15 @@ variables:
 cache:
   paths:
     - .cache/pip
-    - venv/
 
 before_script:
   - python --version  # For debugging
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
+  # - pip install virtualenv
+  # - virtualenv venv
+  # - source venv/bin/activate
 
 run:
   script:
-    # - pip install dist/*
-    # run the command here
     - python spotify-backup.py --format=json --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.json
   artifacts:
     paths:
