@@ -1,0 +1,22 @@
+# Official language image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/python/tags/
+image: python:latest
+
+before_script:
+  - python --version  # For debugging
+
+run:
+  script:
+    - python spotify-backup.py --format=json --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.json
+  artifacts:
+    paths:
+      - output.json
+
+#pages:
+#  script:
+#    - mkdir public
+#  artifacts:
+#    paths:
+#      - public
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
