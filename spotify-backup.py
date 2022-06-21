@@ -151,6 +151,7 @@ def main():
 	parser.add_argument('--dump', default='playlists', choices=['liked,playlists', 'playlists,liked', 'playlists', 'liked'],
 	                    help='dump playlists or liked songs, or both (default: playlists)')
 	parser.add_argument('--format', default='txt', choices=['json', 'txt', 'md'], help='output format (default: txt)')
+	parser.add_argument('--redirect-url', default='', help='redirect url from spotify auth (for offline usage)')
 	parser.add_argument('file', help='output filename', nargs='?')
 	args = parser.parse_args()
 	
@@ -159,9 +160,25 @@ def main():
 		args.file = input('Enter a file name (e.g. playlists.txt): ')
 		args.format = args.file.split('.')[-1]
 	
-	# Log into the Spotify API.
+	# Log into the Spotify API with --token 
 	if args.token:
 		spotify = SpotifyAPI(args.token)
+
+	# Log into the Spotify API with extracted access_token from --redirect_url
+	elif args.redirect_url:
+		regex = r"#access_token=(.*?)\&"
+		if re.search(regex, args.redirect_url, re.MULTILINE) is None:
+			print('could not extract access_token. abort...')
+			exit(2)
+
+		matches = re.finditer(regex, args.redirect_url, re.MULTILINE)		
+		
+		for matchNum, match in enumerate(matches, start=1):
+			access_token = match.group(1)
+
+		spotify = SpotifyAPI(access_token)
+	
+	# Open Authorization URL 
 	else:
 		spotify = SpotifyAPI.authorize(client_id='5c098bcc800e45d49e476265bc9b6934',
 		                               scope='playlist-read-private playlist-read-collaborative user-library-read')

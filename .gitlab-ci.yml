@@ -1,7 +1,6 @@
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
 image: python:latest
-
 stages:
   - test
   - run
@@ -16,8 +15,8 @@ test:
 
 run:
   script:
-    - python spotify-backup.py --format=json --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.json
-    - python spotify-backup.py --format=md --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.md
+    - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.json
+    - python spotify-backup.py --format=md --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.md
     - python -m markdown output.md -x extra -f output.html
   artifacts:
     paths:
