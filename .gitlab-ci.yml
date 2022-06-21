@@ -1,6 +1,11 @@
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
 image: python:latest
+variables:
+  # https://docs.gitlab.com/ee/ci/pipelines/index.html#prefill-variables-in-manual-pipelines
+  SPOTIFY_REDIRECT_URL:
+    value: "http://127.0.0.1:43019/redirect#access_token=...."
+    description: "redirect uri from login on https://accounts.spotify.com/authorize?response_type=token&client_id=5c098bcc800e45d49e476265bc9b6934&scope=playlist-read-private+playlist-read-collaborative+user-library-read&redirect_uri=http%3A%2F%2F127.0.0.1%3A43019%2Fredirect"
 
 stages:
   - test
@@ -8,6 +13,7 @@ stages:
 
 before_script:
   - python --version  # For debugging
+  - pip install markdown
   
 test:
   script:
@@ -15,10 +21,14 @@ test:
 
 run:
   script:
-    - python spotify-backup.py --format=json --dump=liked --token=$SPOTIFY_OAUTH_TOKEN output.json
+    - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.json
+    - python spotify-backup.py --format=md --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.md
+    - python -m markdown output.md -x extra -f output.html
   artifacts:
     paths:
       - output.json
+      - output.md
+      - output.html
   # trigger this job only "by-hand"
   when: manual
 
