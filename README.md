@@ -7,4 +7,5 @@ A Python script that exports all of your Spotify playlists, useful for paranoid 
 
 2. Copy URL to which your browser has been redirected to clipboard
 
-3. Paste URL in manual pipeline step in Gitlab
+3. Paste URL as value for variable `SPOTIFY_REDIRECT_URL` in manual pipeline step in Gitlab
+
