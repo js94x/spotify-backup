@@ -1,3 +1,6 @@
+This repo has been forked from https://github.com/caseychu/spotify-backup
+==============
+
 spotify-backup
 ==============
 
