@@ -14,6 +14,7 @@ stages:
 before_script:
   - python --version  # For debugging
   - pip install markdown
+  - pip install mkdocs
   
 test:
   script:
@@ -25,12 +26,13 @@ pages:
     - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.json
     - python spotify-backup.py --format=md --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.md
     - python -m markdown output.md -x extra -f output.html
-    - mkdir public
-    - cp output.html public/index.html
-    - cp output.json public/
-    - cp output.md public/
+    - mkdir public docs
+    - cp output.md docs/index.md
+    - mkdocs build --strict --verbose --no-directory-urls --site-dir ./public
   artifacts:
     paths:
+      - output.html
+      - output.json
       - public/
   # trigger this job only "by-hand"
   when: manual
