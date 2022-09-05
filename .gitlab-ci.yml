@@ -26,7 +26,8 @@ pages:
     - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.json
     - python spotify-backup.py --format=md --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.md
     - python -m markdown output.md -x extra -f output.html
-    - mkdir public docs
+    - python parse-artists.py
+    - mkdir public docs docs/artists
     - cp output.md docs/index.md
     - mkdocs build --strict --verbose --no-directory-urls --site-dir ./public
   artifacts:
