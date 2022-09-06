@@ -1,4 +1,3 @@
-site_name: Spotify-Archive
+site_name: Spotify-Backup
 theme:
-  name: mkdocs
-  nav_style: dark
+  name: material

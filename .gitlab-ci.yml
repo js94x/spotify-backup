@@ -14,7 +14,7 @@ stages:
 before_script:
   - python --version  # For debugging
   - pip install markdown
-  - pip install mkdocs
+  - pip install mkdocs mkdocs-material
   - mkdir public docs docs/artists
   
 test:
