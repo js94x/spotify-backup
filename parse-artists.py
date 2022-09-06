@@ -12,7 +12,7 @@ for t in loaded["playlists"][0]["tracks"]:
 unique_artist_list = list(set(artist_list))
 
 for ua in unique_artist_list:
-    print("Artist: " + ua + "\n")
+    # print("Artist: " + ua + "\n")
     f = open('./docs/artists/' + ua.replace('/', '_') + '.md', "a")
     f.write(
     "# " + ua + "\n\n"

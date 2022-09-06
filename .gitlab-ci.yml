@@ -29,7 +29,7 @@ pages:
     - python -m markdown output.md -x extra -f output.html
     - cp output.md docs/index.md
     - python parse-artists.py
-    - mkdocs build --strict --verbose --no-directory-urls --site-dir ./public
+    - mkdocs build --strict --no-directory-urls --site-dir ./public
   artifacts:
     paths:
       - output.html
