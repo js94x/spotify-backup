@@ -15,6 +15,7 @@ before_script:
   - python --version  # For debugging
   - pip install markdown
   - pip install mkdocs
+  - mkdir public docs docs/artists
   
 test:
   script:
@@ -26,9 +27,8 @@ pages:
     - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.json
     - python spotify-backup.py --format=md --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.md
     - python -m markdown output.md -x extra -f output.html
-    - python parse-artists.py
-    - mkdir public docs docs/artists
     - cp output.md docs/index.md
+    - python parse-artists.py
     - mkdocs build --strict --verbose --no-directory-urls --site-dir ./public
   artifacts:
     paths:
