@@ -1,3 +1,5 @@
 site_name: Spotify-Backup
 theme:
   name: material
+  palette:
+    scheme: slate
