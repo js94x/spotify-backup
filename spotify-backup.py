@@ -235,7 +235,7 @@ def main():
 						continue
 					f.write('|{name}|{artists}|{album}|\n'.format(
 						name=track['track']['name'],
-						artists=', '.join(["["+artist['name']+"]"+"(./artists/"+urllib.parse.quote(artist['name'])+")" for artist in track['track']['artists']]),
+						artists=', '.join(["["+artist['name']+"]"+"(./artists/"+urllib.parse.quote(artist['name'])+".md)" for artist in track['track']['artists']]),
 						album=track['track']['album']['name']
 					))
 				f.write('\n')
