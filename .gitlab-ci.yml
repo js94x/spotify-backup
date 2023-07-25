@@ -35,6 +35,7 @@ pages:
     - python parse-artists.py
     - mkdocs build --strict --no-directory-urls --site-dir ./public
   artifacts:
+    expire_in: 1 day
     paths:
       - output.html
       - output.json
