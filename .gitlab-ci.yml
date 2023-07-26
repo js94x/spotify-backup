@@ -27,10 +27,14 @@ pages:
     - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.json
     - python spotify-backup.py --format=md --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.md
     - python -m markdown output.md -x extra -f output.html
-    - echo "---" > docs/index.md
-    - echo "hide:" >> docs/index.md
-    - echo "  - toc" >> docs/index.md
-    - echo "---" >> docs/index.md
+    - |
+      # hide navigation at homepage
+      cat <<EOF > docs/index.md
+      ---
+      hide:
+        - toc
+      ---
+      EOF
     - cat output.md >> docs/index.md
     - python parse-artists.py
     - mkdocs build --strict --no-directory-urls --site-dir ./public
