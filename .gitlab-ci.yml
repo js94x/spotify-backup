@@ -1,6 +1,6 @@
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
-image: python:latest
+image: $CI_REGISTRY/$CI_PROJECT_ROOT_NAMESPACE/$JSC_GRP_IMG_UBUNTU_24
 variables:
   # https://docs.gitlab.com/ee/ci/pipelines/index.html#prefill-variables-in-manual-pipelines
   SPOTIFY_REDIRECT_URL:
