@@ -34,9 +34,9 @@ get_data:
   artifacts:
     expire_in: 1 day
     paths:
-      - *.md
-      - *.json
-      - *.html
+      - "*.md"
+      - "*.json"
+      - "*.html"
   # trigger this job only "by-hand"
   when: manual
 
