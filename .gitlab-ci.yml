@@ -16,7 +16,7 @@ before_script:
   - python --version  # For debugging
   - pip install markdown
   - pip install mkdocs mkdocs-material
-  - mkdir public docs docs/artists
+  - mkdir -p public docs docs/artists docs/liked docs/playlists
   
 test:
   script:
