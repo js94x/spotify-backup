@@ -9,6 +9,7 @@ variables:
 
 stages:
   - test
+  - gather
   - deploy
 
 before_script:
@@ -21,8 +22,8 @@ test:
   script:
     - python -m py_compile *.py
 
-pages:
-  stage: deploy
+get_data:
+  stage: gather
   script:
     - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL liked.json
     - python spotify-backup.py --format=json --dump=playlists --redirect-url=$SPOTIFY_REDIRECT_URL playlists.json
@@ -30,6 +31,20 @@ pages:
     - python json2md.py  -i playlists.json -o playlists.md
     - python -m markdown liked.md -x extra -f liked.html
     - python -m markdown playlists.md -x extra -f playlists.html
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - *.md
+      - *.json
+      - *.html
+  # trigger this job only "by-hand"
+  when: manual
+
+pages:
+  stage: deploy
+  dependencies:
+    - get_data
+  script:
     - |
       # hide navigation at homepage
       cat <<EOF > docs/index.md
@@ -44,9 +59,6 @@ pages:
   artifacts:
     expire_in: 1 day
     paths:
-      - *.md
-      - *.json
-      - *.html
       - public/
   # trigger this job only "by-hand"
   when: manual
