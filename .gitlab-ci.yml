@@ -46,3 +46,30 @@ pages:
       - public/
   # trigger this job only "by-hand"
   when: manual
+
+playlists:
+  stage: deploy
+  script:
+    - python spotify-backup.py --format=json --dump=playlists --redirect-url=$SPOTIFY_REDIRECT_URL output_playlists.json
+    - python spotify-backup.py --format=md --dump=playlists --redirect-url=$SPOTIFY_REDIRECT_URL output_playlists.md
+    - python -m markdown output_playlists.md -x extra -f output_playlists.html
+    - |
+      # hide navigation at homepage
+      cat <<EOF > docs/index.md
+      ---
+      hide:
+        - toc
+      ---
+      EOF
+    - cat output_playlists.md >> docs/index.md
+    # - python parse-artists.py
+    - mkdocs build --strict --no-directory-urls --site-dir ./public
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - output_playlists.md
+      - output_playlists.html
+      - output_playlists.json
+      - public/
+  # trigger this job only "by-hand"
+  when: manual
