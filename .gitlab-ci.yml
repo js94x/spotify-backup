@@ -45,7 +45,7 @@ pages:
   dependencies:
     - get_data
   script:
-    - mv liked.md docs/liked/index.md
+    - cat liked.md >> docs/liked/index.md
     - python json2md.py  -i playlists.json -o docs/playlists/index.md --per-playlist
     - mkdocs build --no-directory-urls --site-dir ./public
   artifacts:
