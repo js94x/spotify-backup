@@ -1,10 +1,7 @@
 ---
 hide:
 - toc
+- navigation
 ---
 
-# Spotify Backup
-
-## Lieblingssongs
-
-## Playlists
+![logo.png](logo.png)
