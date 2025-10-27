@@ -1,7 +1,26 @@
-import argparse, json, logging, sys, urllib.parse
+import argparse, json, logging, sys, urllib.parse, os
 
 logging.basicConfig(level=20, datefmt='%I:%M:%S', format='[%(asctime)s] %(message)s')
 
+
+def _artist_link(name):
+    return f"{name}"
+    # return f"[{name}](./artists/{urllib.parse.quote(name.replace('/', '_'))}.md)"
+
+def _write_playlist(f, playlist, header):
+    f.write(f"{header} {playlist.get('name', 'playlist')}\n\n")
+    f.write('|Titel|Artist(s)|Album|\n|---|---|---|\n')
+    for item in playlist.get('tracks', []):
+        tr = item.get('track') if isinstance(item, dict) else None
+        if not tr:
+            continue
+        artists = ', '.join(_artist_link(a['name']) for a in tr.get('artists', []))
+        f.write('|{name}|{artists}|{album}|\n'.format(
+            name=tr.get('name', ''),
+            artists=artists,
+            album=tr.get('album', {}).get('name', '')
+        ))
+    f.write('\n')
 
 def main():
     # Parse arguments.
@@ -13,6 +32,8 @@ def main():
                         help='output filename (required)',
                         default='output.md',
                         required=True)
+    parser.add_argument('-s', '--per-playlist', dest='per_playlist', action='store_true',
+                        help='write each playlist to its own file named after the playlist (default: false)')
     args = parser.parse_args()
     # Load input JSON. Support '-' for stdin.
     try:
@@ -42,24 +63,28 @@ def main():
         args.format = args.file.split('.')[-1]
 
 
-    with open(args.file, 'w', encoding='utf-8') as f:
+    # Write either a single file with all playlists (default) or one file per playlist.
+    output_dir = os.path.dirname(args.file)
+    if output_dir == '':
+        output_dir = ''
 
-        f.write('# Spotify Dump\n\n')
-        for playlist in data['playlists']:
-            f.write('## ' + playlist['name'] + '\n\n')
-            f.write('|Titel|Artist(s)|Album|\n')
-            f.write('|---|---|---|\n')
-            for track in playlist['tracks']:
-                if track['track'] is None:
-                    continue
-                f.write('|{name}|{artists}|{album}|\n'.format(
-                    name=track['track']['name'],
-                    artists=', '.join(["["+artist['name']+"]"+"(./artists/"+urllib.parse.quote(artist['name'].replace("/", "_"))+".md)" for artist in track['track']['artists']]),
-                    album=track['track']['album']['name']
-                ))
-            f.write('\n')
-    
-    logging.info('Wrote file: ' + args.file)
+    if args.per_playlist:
+        written_files = []
+        for playlist in playlists:
+            pname = playlist.get('name', 'playlist')
+            safe_name = urllib.parse.quote(pname.replace("/", "_"))
+            filename = f"{safe_name}.{args.format}"
+            path = os.path.join(output_dir, filename) if output_dir else filename
+            with open(path, 'w', encoding='utf-8') as f:
+                _write_playlist(f, playlist, '#')
+            written_files.append(path)
+        # make the final logging line reflect what was actually written
+        args.file = ','.join(written_files)
+    else:
+        with open(args.file, 'w', encoding='utf-8') as f:
+            for playlist in playlists:
+                _write_playlist(f, playlist, '#')
+        logging.info('Wrote file: ' + args.file)
 
 if __name__ == '__main__':
     main()
