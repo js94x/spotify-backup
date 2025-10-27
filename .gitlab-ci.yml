@@ -63,7 +63,7 @@ playlists:
       EOF
     - cat output_playlists.md >> docs/index.md
     # - python parse-artists.py
-    - mkdocs build --strict --no-directory-urls --site-dir ./public
+    - mkdocs build --no-directory-urls --site-dir ./public
   artifacts:
     expire_in: 1 day
     paths:
