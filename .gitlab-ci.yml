@@ -24,9 +24,12 @@ test:
 pages:
   stage: deploy
   script:
-    - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.json
-    - python spotify-backup.py --format=md --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL output.md
-    - python -m markdown output.md -x extra -f output.html
+    - python spotify-backup.py --format=json --dump=liked --redirect-url=$SPOTIFY_REDIRECT_URL liked.json
+    - python spotify-backup.py --format=json --dump=playlists --redirect-url=$SPOTIFY_REDIRECT_URL playlists.json
+    - python json2md.py  -i liked.json -o liked.md
+    - python json2md.py  -i playlists.json -o playlists.md
+    - python -m markdown liked.md -x extra -f liked.html
+    - python -m markdown playlists.md -x extra -f playlists.html
     - |
       # hide navigation at homepage
       cat <<EOF > docs/index.md
@@ -35,41 +38,15 @@ pages:
         - toc
       ---
       EOF
-    - cat output.md >> docs/index.md
+    - cat liked.md >> docs/index.md
     - python parse-artists.py
     - mkdocs build --strict --no-directory-urls --site-dir ./public
   artifacts:
     expire_in: 1 day
     paths:
-      - output.html
-      - output.json
+      - *.md
+      - *.json
+      - *.html
       - public/
-  # trigger this job only "by-hand"
-  when: manual
-
-playlists:
-  stage: deploy
-  script:
-    - python spotify-backup.py --format=json --dump=playlists --redirect-url=$SPOTIFY_REDIRECT_URL output_playlists.json
-    - python spotify-backup.py --format=md --dump=playlists --redirect-url=$SPOTIFY_REDIRECT_URL output_playlists.md
-    # - python -m markdown output_playlists.md -x extra -f output_playlists.html
-    # - |
-    #   # hide navigation at homepage
-    #   cat <<EOF > docs/index.md
-    #   ---
-    #   hide:
-    #     - toc
-    #   ---
-    #   EOF
-    # - cat output_playlists.md >> docs/index.md
-    # # - python parse-artists.py
-    # - mkdocs build --no-directory-urls --site-dir ./public
-  artifacts:
-    expire_in: 1 year
-    paths:
-      - output_playlists.md
-      # - output_playlists.html
-      - output_playlists.json
-      # - public/
   # trigger this job only "by-hand"
   when: manual
