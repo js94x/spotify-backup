@@ -2,7 +2,7 @@ import json
 
 artist_list = []
 
-with open('output.json') as a:
+with open('liked.json') as a:
     loaded = json.load(a)
 
 for t in loaded["playlists"][0]["tracks"]:
