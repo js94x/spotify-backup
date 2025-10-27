@@ -45,17 +45,9 @@ pages:
   dependencies:
     - get_data
   script:
-    - |
-      # hide navigation at homepage
-      cat <<EOF > docs/index.md
-      ---
-      hide:
-        - toc
-      ---
-      EOF
-    - cat liked.md >> docs/index.md
-    - python parse-artists.py
-    - mkdocs build --strict --no-directory-urls --site-dir ./public
+    - mv liked.md docs/liked/index.md
+    - python json2md.py  -i playlists.json -o docs/playlists/index.md --per-playlist
+    - mkdocs build --no-directory-urls --site-dir ./public
   artifacts:
     expire_in: 1 day
     paths:
