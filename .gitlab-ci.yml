@@ -27,7 +27,7 @@ get_data:
   stage: gather
   script:
     - python spotify-backup.py --format=json --dump=liked --code-verifier gYHBQvroFLuOQ8XOshNpBxfuA7jnDRQzyGJaDyARwKe5n4Ys79gWNhmJCekGtgfC --redirect-url=$SPOTIFY_REDIRECT_URL liked.json
-    - python spotify-backup.py --format=json --dump=playlists --code-verifer gYHBQvroFLuOQ8XOshNpBxfuA7jnDRQzyGJaDyARwKe5n4Ys79gWNhmJCekGtgfC --redirect-url=$SPOTIFY_REDIRECT_URL playlists.json
+    - python spotify-backup.py --format=json --dump=playlists --code-verifier gYHBQvroFLuOQ8XOshNpBxfuA7jnDRQzyGJaDyARwKe5n4Ys79gWNhmJCekGtgfC --redirect-url=$SPOTIFY_REDIRECT_URL playlists.json
     - python json2md.py  -i liked.json -o liked.md
     - python json2md.py  -i playlists.json -o playlists.md
     - python -m markdown liked.md -x extra -f liked.html
