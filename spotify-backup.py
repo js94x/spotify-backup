@@ -8,6 +8,7 @@ import json
 import logging
 import re
 import sys
+import os
 import time
 import urllib.error
 import urllib.parse
@@ -178,6 +179,7 @@ def main():
 	                    help='dump playlists or liked songs, or both (default: playlists)')
 	parser.add_argument('--format', default='txt', choices=['json', 'txt', 'md'], help='output format (default: txt)')
 	parser.add_argument('--redirect-url', default='', help='redirect url from spotify auth (for offline usage)')
+	parser.add_argument('--code-verifier', default=None, help='PKCE code_verifier (for exchanging authorization code headlessly)')
 	parser.add_argument('file', help='output filename', nargs='?')
 	args = parser.parse_args()
 	
@@ -190,19 +192,39 @@ def main():
 	if args.token:
 		spotify = SpotifyAPI(args.token)
 
-	# Log into the Spotify API with extracted access_token from --redirect_url
+	# Log into the Spotify API with extracted access_token or authorization code from --redirect_url
 	elif args.redirect_url:
-		regex = r"#access_token=(.*?)\&"
-		if re.search(regex, args.redirect_url, re.MULTILINE) is None:
-			print('could not extract access_token. abort...')
-			exit(2)
+		# fragment-style token (e.g. #access_token=...)
+		m = re.search(r"#access_token=([^&]+)", args.redirect_url)
+		if m:
+			spotify = SpotifyAPI(m.group(1))
+		else:
+			# query-style authorization code (e.g. ?code=...)
+			m = re.search(r"[?&]code=([^&]+)", args.redirect_url)
+			if not m:
+				print('could not extract access_token or code. abort...')
+				exit(2)
 
-		matches = re.finditer(regex, args.redirect_url, re.MULTILINE)		
-		
-		for matchNum, match in enumerate(matches, start=1):
-			access_token = match.group(1)
+			code = m.group(1)
+			# Obtain code_verifier non-interactively: CLI arg or environment variable
+			code_verifier = args.code_verifier or os.environ.get('PKCE_CODE_VERIFIER') or os.environ.get('CODE_VERIFIER')
+			if not code_verifier:
+				print('Authorization code found but no code_verifier provided. Use --code-verifier or set PKCE_CODE_VERIFIER env var.')
+				exit(2)
 
-		spotify = SpotifyAPI(access_token)
+			# Exchange the authorization code for an access token (PKCE)
+			body = bytes(urllib.parse.urlencode({
+				'grant_type': 'authorization_code',
+				'code': code,
+				'redirect_uri': 'http://127.0.0.1:{}/redirect'.format(SpotifyAPI._SERVER_PORT),
+				'client_id': '5c098bcc800e45d49e476265bc9b6934',
+				'code_verifier': code_verifier,
+			}), encoding='utf-8')
+			req = urllib.request.Request("https://accounts.spotify.com/api/token", data=body)
+			req.add_header('content-type', 'application/x-www-form-urlencoded')
+			res = urllib.request.urlopen(req)
+			reader = codecs.getreader('utf-8')
+			spotify = SpotifyAPI(json.load(reader(res))['access_token'])
 	
 	# Open Authorization URL 
 	else:
