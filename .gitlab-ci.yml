@@ -3,7 +3,11 @@
 image: $CI_REGISTRY/$CI_PROJECT_ROOT_NAMESPACE/$JSC_GRP_IMG_UBUNTU_24
 variables:
   # https://docs.gitlab.com/ee/ci/pipelines/index.html#prefill-variables-in-manual-pipelines
-  SPOTIFY_REDIRECT_URL:
+  SPOTIFY_REDIRECT_URL_LIKED:
+    value: "http://127.0.0.1:43019/redirect?code=...."
+    description: "redirect uri from login on https://accounts.spotify.com/authorize?response_type=code&client_id=5c098bcc800e45d49e476265bc9b6934&scope=playlist-read-private+playlist-read-collaborative+user-library-read&redirect_uri=http%3A%2F%2F127.0.0.1%3A43019%2Fredirect&code_challenge_method=S256&code_challenge=0Ng0kl3XTL9Bb8wsTgsX-YBODDldSYQyeHgL_7pUi6Q"
+
+  SPOTIFY_REDIRECT_URL_PLAYLISTS:
     value: "http://127.0.0.1:43019/redirect?code=...."
     description: "redirect uri from login on https://accounts.spotify.com/authorize?response_type=code&client_id=5c098bcc800e45d49e476265bc9b6934&scope=playlist-read-private+playlist-read-collaborative+user-library-read&redirect_uri=http%3A%2F%2F127.0.0.1%3A43019%2Fredirect&code_challenge_method=S256&code_challenge=0Ng0kl3XTL9Bb8wsTgsX-YBODDldSYQyeHgL_7pUi6Q"
 
@@ -23,14 +27,26 @@ test:
   script:
     - python -m py_compile *.py
 
-get_data:
+get_data_liked:
   stage: gather
   script:
-    - python spotify-backup.py --format=json --dump=liked --code-verifier gYHBQvroFLuOQ8XOshNpBxfuA7jnDRQzyGJaDyARwKe5n4Ys79gWNhmJCekGtgfC --redirect-url=$SPOTIFY_REDIRECT_URL liked.json
-    - python spotify-backup.py --format=json --dump=playlists --code-verifier gYHBQvroFLuOQ8XOshNpBxfuA7jnDRQzyGJaDyARwKe5n4Ys79gWNhmJCekGtgfC --redirect-url=$SPOTIFY_REDIRECT_URL playlists.json
+    - python spotify-backup.py --format=json --dump=liked --code-verifier gYHBQvroFLuOQ8XOshNpBxfuA7jnDRQzyGJaDyARwKe5n4Ys79gWNhmJCekGtgfC --redirect-url=$SPOTIFY_REDIRECT_URL_LIKED liked.json
     - python json2md.py  -i liked.json -o liked.md
-    - python json2md.py  -i playlists.json -o playlists.md
     - python -m markdown liked.md -x extra -f liked.html
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - "*.md"
+      - "*.json"
+      - "*.html"
+  # trigger this job only "by-hand"
+  when: manual
+
+get_data_playlists:
+  stage: gather
+  script:
+    - python spotify-backup.py --format=json --dump=playlists --code-verifier gYHBQvroFLuOQ8XOshNpBxfuA7jnDRQzyGJaDyARwKe5n4Ys79gWNhmJCekGtgfC --redirect-url=$SPOTIFY_REDIRECT_URL_PLAYLISTS playlists.json
+    - python json2md.py  -i playlists.json -o playlists.md
     - python -m markdown playlists.md -x extra -f playlists.html
   artifacts:
     expire_in: 1 day
@@ -44,7 +60,8 @@ get_data:
 pages:
   stage: deploy
   dependencies:
-    - get_data
+    - get_data_liked
+    - get_data_playlists
   script:
     - cat liked.md >> docs/liked/index.md
     - python json2md.py  -i playlists.json -o docs/playlists/index.md --per-playlist
